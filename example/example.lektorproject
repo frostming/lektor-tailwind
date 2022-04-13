@@ -1,0 +1,5 @@
+[project]
+name = example
+output_path = _build
+
+[packages]

@@ -16,6 +16,7 @@ tailwind = "lektor_tailwind:TailwindPlugin"
 
 [tool.pdm]
 version = {use_scm = true}
+includes = ["lektor_tailwind.py"]
 
 [build-system]
 requires = ["pdm-pep517>=0.12.0"]

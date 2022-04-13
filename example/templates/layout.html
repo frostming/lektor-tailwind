@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="{{ '/static/style.css'|url }}">
+<title>{% block title %}Welcome{% endblock %} — lektor-sample</title>
+<body>
+  <div class="container mx-auto">
+    <header class="flex items-center justify-between bg-primary-100 text-gray-800 px-6 py-8">
+      <h1 class="text-3xl font-bold">lektor-sample</h1>
+      <nav class="flex items-center text-xl gap-4">
+          <div{% if this._path == '/' %} class="font-bold"{% endif
+            %}><a href="{{ '/'|url }}">Welcome</a></div>
+          {% for href, title in [
+            ['/blog', 'Blog'],
+            ['/projects', 'Projects'],
+            ['/about', 'About']
+          ] %}
+            <div{% if this.is_child_of(href) %} class="font-bold"{% endif
+              %}><a href="{{ href|url }}">{{ title }}</a></div>
+          {% endfor %}
+        </nav>
+    </header>
+    <div class="prose py-12">
+      {% block body %}{% endblock %}
+    </div>
+    <footer>
+      &copy; Copyright 2022 by Frost Ming.
+    </footer>
+  </div>
+</body>

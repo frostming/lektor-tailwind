@@ -17,7 +17,7 @@ A Lektor plugin that adds Tailwind CSS to your project seamlessly.
 
    ```javascript
    module.exports = {
-     content: ['./src/**/*.{html,js}'],
+     content: ['./templates/**/*.{html,j2}'],
      theme: {
        extend: {},
      },

@@ -1,0 +1,15 @@
+[[package]]
+name = "pytailwindcss"
+version = "0.1.4"
+requires_python = ">=3.8,<4.0"
+summary = "Standalone Tailwind CSS CLI, installable via pip. Use Tailwind CSS without Node.js."
+
+[metadata]
+lock_version = "3.1"
+content_hash = "sha256:e101849738aa097f46349a00c7ac436aa235eb2335bc905711847426a5cf00d5"
+
+[metadata.files]
+"pytailwindcss 0.1.4" = [
+    {file = "pytailwindcss-0.1.4-py3-none-any.whl", hash = "sha256:fa78a3abd650d48dade10d0282df71e2f2757934595f8470f0d0c2ce175f5a15"},
+    {file = "pytailwindcss-0.1.4.tar.gz", hash = "sha256:2376fe551674a00f38cbdf134fc6d1dc87bf43bb396c5d4ce183c7d63153c39f"},
+]

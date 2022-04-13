@@ -1,0 +1,22 @@
+[project]
+name = "lektor-tailwind"
+description = ""
+authors = [
+    {name = "Frost Ming", email = "mianghong@gmail.com"},
+]
+dependencies = [
+    "pytailwindcss>=0.1.4",
+]
+requires-python = ">=3.8"
+license = {text = "MIT"}
+dynamic = ["version"]
+
+[project.entry-points."lektor.plugins"]
+tailwind = "lektor_tailwind:TailwindPlugin"
+
+[tool.pdm]
+version = {use_scm = true}
+
+[build-system]
+requires = ["pdm-pep517>=0.12.0"]
+build-backend = "pdm.pep517.api"

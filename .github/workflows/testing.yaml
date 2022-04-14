@@ -1,0 +1,42 @@
+name: Testing Plugin
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9, '3.10']
+        lektor-version: [latest, stable]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache PIP
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ matrix.python-version }}-${{ matrix.lektor-version }}
+          restore-keys: pip-${{ matrix.python-version }}-
+
+      - name: Install Lektor latest
+        if: matrix.lektor-version == 'latest'
+        run: pip install "lektor @ git+https://github.com/lektor/lektor.git"
+
+      - name: Install Lektor stable
+        if: matrix.lektor-version == 'stable'
+        run: pip install -U lektor
+
+      - name: Run tests
+        run: cd tests && ./run_test.sh

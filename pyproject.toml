@@ -11,6 +11,15 @@ requires-python = ">=3.8"
 license = {text = "MIT"}
 dynamic = ["version"]
 
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+
 [project.entry-points."lektor.plugins"]
 tailwind = "lektor_tailwind:TailwindPlugin"
 

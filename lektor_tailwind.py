@@ -80,9 +80,13 @@ class TailwindPlugin(Plugin):
             self.tailwind = None
 
     def on_before_build_all(self, builder, **extra):
-        if not self.input_exists() or self.tailwind is not None:
+        if not self.input_exists() or self.tailwind is not None or not self.watch:
             return
-        if self.watch:
-            self._run_watcher(builder.destination_path)
-        else:
-            self.compile_css(builder.destination_path)
+        self._run_watcher(builder.destination_path)
+
+    def on_before_build(self, builder, source, prog, **extra):
+        if self.tailwind is not None:
+            return
+        if source.source_filename != self.input_css:
+            return
+        self.compile_css(builder.destination_path)

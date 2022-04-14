@@ -24,6 +24,10 @@ classifiers = [
 [project.entry-points."lektor.plugins"]
 tailwind = "lektor_tailwind:TailwindPlugin"
 
+[project.urls]
+Homepage = "https://github.com/frostming/lektor-tailwind"
+Repository = "https://github.com/frostming/lektor-tailwind"
+
 [tool.pdm]
 version = {use_scm = true}
 includes = ["lektor_tailwind.py"]

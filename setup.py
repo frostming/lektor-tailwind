@@ -13,7 +13,7 @@ ENTRY_POINTS = {
 
 setup_kwargs = {
     "name": "lektor-tailwind",
-    "version": "0.1.dev4+g40abe28.d20220414",
+    "version": "0.1",
     "description": "",
     "long_description": long_description,
     "license": "MIT",

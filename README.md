@@ -2,6 +2,13 @@
 
 A Lektor plugin that adds Tailwind CSS to your project seamlessly.
 
+[![Build Status](https://github.com/frostming/lektor-tailwind/actions/workflows/testing.yaml/badge.svg)][gha]
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lektor-tailwind)][pypi]
+[![PyPI](https://img.shields.io/pypi/v/lektor-tailwind)][pypi]
+
+[gha]: https://github.com/frostming/lektor-tailwind/actions/workflows/testing.yaml
+[pypi]: https://pypi.org/project/lektor-tailwind
+
 ## Get Started
 
 1. Add plugin to your project

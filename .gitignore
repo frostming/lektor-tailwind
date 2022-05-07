@@ -3,3 +3,4 @@
 /dist/
 __pycache__/
 .pdm.toml
+*.egg-info/

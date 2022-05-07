@@ -18,7 +18,7 @@ if ! which realpath > /dev/null; then
 fi
 
 project_root=$(dirname "$(dirname "$(realpath "$0")")")
-copy_files=("setup.py" "lektor_tailwind.py" "README.md" "LICENSE")
+copy_files=("setup.py" "setup.cfg" "lektor_tailwind.py" "README.md" "LICENSE")
 cd "$(pwd)/example"
 
 rm -fr packages

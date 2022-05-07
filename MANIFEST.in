@@ -1,0 +1,8 @@
+graft tests
+
+prune tests/example/_build
+prune tests/example/packages
+
+global-exclude *.pyc
+global-exclude .DS_Store
+global-exclude .gitignore

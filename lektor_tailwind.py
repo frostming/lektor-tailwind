@@ -85,7 +85,7 @@ class TailwindPlugin(Plugin):
             return
         self._run_watcher(builder.destination_path)
 
-    def on_before_build(self, builder, source, prog, **extra):
+    def on_after_build(self, builder, source, prog, **extra):
         if self.tailwind is not None:
             return
         if source.source_filename != self.input_css:

@@ -95,7 +95,7 @@ class TailwindPlugin(Plugin):
         # output that is already there.
 
         # Here we monkey-patch Lektor's build program to disable it
-        prog.produce_artifacts = lambda: None
+        prog.build_artifact = lambda artifact: None
 
         # Instead, we run tailwind to compile the self.input_css to
         # the output directory.  (We skip this if we're already

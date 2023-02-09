@@ -14,17 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9, '3.10']
+        python-version: [3.8, 3.9, '3.10', '3.11']
         lektor-version: [latest, stable]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache PIP
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: pip-${{ matrix.python-version }}-${{ matrix.lektor-version }}
@@ -38,5 +38,8 @@ jobs:
         if: matrix.lektor-version == 'stable'
         run: pip install -U lektor
 
+      - name: Install Pytest
+        run: pip install -U pytest
+
       - name: Run tests
-        run: cd tests && ./run_test.sh
+        run: pytest tests

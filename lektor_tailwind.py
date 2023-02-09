@@ -85,9 +85,21 @@ class TailwindPlugin(Plugin):
             return
         self._run_watcher(builder.destination_path)
 
-    def on_after_build(self, builder, source, prog, **extra):
-        if self.tailwind is not None:
-            return
+    def on_before_build(self, builder, source, prog, **extra):
         if source.source_filename != self.input_css:
             return
-        self.compile_css(builder.destination_path)
+
+        # The input stylesheet is being built.  We don't want to let
+        # Lektor "build" it (i.e. copy it to the output directory),
+        # since that will potentially overwrite any Tailwind-compiled
+        # output that is already there.
+
+        # Here we monkey-patch Lektor's build program to disable it
+        prog.build_artifact = lambda artifact: None
+
+        # Instead, we run tailwind to compile the self.input_css to
+        # the output directory.  (We skip this if we're already
+        # running tailwind in --watch mode, since, in that case, it
+        # will rebuild the CSS on it's own.)
+        if self.tailwind is None:
+            self.compile_css(builder.destination_path)

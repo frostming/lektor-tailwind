@@ -7,7 +7,7 @@ import threading
 from lektor.pluginsystem import Plugin
 from pytailwindcss import install, get_bin_path
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 GRACEFUL_TIMEOUT = 5
 
 

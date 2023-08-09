@@ -65,6 +65,7 @@ class TailwindPlugin(Plugin):
                 "--minify",
             ],
             check=True,
+            cwd=self.env.root_path,
         )
 
     def on_server_spawn(self, **extra):

@@ -163,7 +163,13 @@ class LektorServerFixture:
 
 
 @pytest.fixture
-def lektor_server(tmp_project_path):
+def node_env():
+    return "development"
+
+
+@pytest.fixture
+def lektor_server(tmp_project_path, node_env, monkeypatch):
+    monkeypatch.setenv("NODE_ENV", node_env)
     with LektorServerFixture() as fixture:
         yield fixture
 
@@ -202,3 +208,11 @@ def test_server_rebuilds_css_when_input_css_updated(
     lektor_server.wait_for_build()
     assert ".SENTINEL" in output_css_path.read_text()
     assert ".flex" in output_css_path.read_text()
+
+
+@pytest.mark.parametrize("node_env", ["production"])
+def test_server_build_minified(lektor_server, output_css_path, node_env):
+    lektor_server.wait_for_build()
+    assert ".flex" in output_css_path.read_text()
+    lines_of_css = len(output_css_path.read_text().splitlines())
+    assert lines_of_css == 1

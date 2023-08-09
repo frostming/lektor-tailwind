@@ -39,17 +39,19 @@ class TailwindPlugin(Plugin):
     def _run_watcher(self, output_path: str):
         if not self.input_exists():
             return
-        self.tailwind = subprocess.Popen(
-            [
-                self.tailwind_bin,
-                "-i",
-                self.input_css,
-                "-o",
-                os.path.join(output_path, self.css_path),
-                "-w",
-            ],
-            cwd=self.env.root_path,
-        )
+
+        cmd = [
+            self.tailwind_bin,
+            "--input",
+            self.input_css,
+            "--output",
+            os.path.join(output_path, self.css_path),
+            "--watch",
+        ]
+        if os.environ.get("NODE_ENV") == "production":
+            cmd.append("--minify")
+
+        self.tailwind = subprocess.Popen(cmd, cwd=self.env.root_path)
 
     def input_exists(self) -> bool:
         return os.path.exists(self.input_css)

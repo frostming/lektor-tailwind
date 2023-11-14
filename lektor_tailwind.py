@@ -22,7 +22,7 @@ class TailwindPlugin(Plugin):
         self.watch = False
         self.css_path = config.get("css_path", "static/style.css")
         self.input_css = os.path.join(self.env.root_path, "assets", self.css_path)
-        self.tailwind: threading.Thread | None = None
+        self.tailwind: subprocess.Popen | None = None
 
     def on_setup_env(self, **extra):
         self.init_tailwindcss()
@@ -65,6 +65,7 @@ class TailwindPlugin(Plugin):
                 "--minify",
             ],
             check=True,
+            cwd=self.env.root_path,
         )
 
     def on_server_spawn(self, **extra):

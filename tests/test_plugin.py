@@ -17,12 +17,12 @@ PACKAGE_FILES = (
 
 
 @pytest.fixture
-def tmp_project(tmp_path):
-    """Chdir into a temporary directory containing a copy of the example
-    test project.
+def tmp_project_path(tmp_path, monkeypatch):
+    """Copy the example test project to a temporary location.
 
     The source files for the lektor_tailwind plugin are copied into the
     the ``packages`` directory of the temporary project.
+
     """
     testdir = Path(__file__).parent
     example = testdir / "example"
@@ -41,20 +41,23 @@ def tmp_project(tmp_path):
     for fn in PACKAGE_FILES:
         shutil.copy(srcdir / fn, packagedir / fn)
 
-    save_cwd = os.getcwd()
-    try:
-        os.chdir(project)
-        yield project
-    finally:
-        os.chdir(save_cwd)
+    monkeypatch.setenv("LEKTOR_PROJECT", os.fspath(project))
+
+    return project
 
 
 @pytest.fixture
-def slow_build(tmp_project):
+def output_css_path(tmp_project_path):
+    """Where to expect the built CSS."""
+    return tmp_project_path / "_build/static/style.css"
+
+
+@pytest.fixture
+def slow_build(tmp_project_path):
     """Delay Lektor server's build_all."""
     build_delay = 0.5
 
-    plugin = tmp_project / "packages/slow_build"
+    plugin = tmp_project_path / "packages/slow_build"
     plugin.mkdir(parents=True)
     plugin.joinpath("setup.py").write_text(dedent("""
         from setuptools import setup
@@ -160,39 +163,42 @@ class LektorServerFixture:
 
 
 @pytest.fixture
-def lektor_server(tmp_project):
+def lektor_server(tmp_project_path):
     with LektorServerFixture() as fixture:
         yield fixture
 
 
-OUTPUT_CSS = Path("_build/static/style.css")
-
-
 @pytest.mark.parametrize("prune", ("--prune", "--no-prune"))
-def test_build_builds_css(tmp_project, prune):
+def test_build_builds_css(tmp_project_path, prune, output_css_path):
     subprocess.run(("lektor", "build", prune), check=True, timeout=30)
-    assert "tailwindcss" in OUTPUT_CSS.read_text()
+    # Check for utility class name rather than just "tailwindcss"
+    # to confirm that tailwind actually found the project source files.
+    assert ".flex" in output_css_path.read_text()
 
 
-def test_server_rebuilds_css_when_template_updated(lektor_server):
+def test_server_rebuilds_css_when_template_updated(
+    lektor_server, tmp_project_path, output_css_path
+):
     lektor_server.wait_for_build()
-    assert "tailwindcss" in OUTPUT_CSS.read_text()
+    assert ".flex" in output_css_path.read_text()
 
-    with open("templates/layout.html", "a") as fp:
+    with open(tmp_project_path / "templates/layout.html", "a") as fp:
         fp.write("""<div class="before:content-['SENTINEL']"></div>\n""")
 
     lektor_server.wait_for_build()
-    assert "SENTINEL" in OUTPUT_CSS.read_text()
+    assert "SENTINEL" in output_css_path.read_text()
 
 
 @pytest.mark.usefixtures("slow_build")  # excercise race condition
-def test_server_rebuilds_css_when_input_css_updated(lektor_server):
+def test_server_rebuilds_css_when_input_css_updated(
+    lektor_server, tmp_project_path, output_css_path
+):
     lektor_server.wait_for_build()
-    assert "tailwindcss" in OUTPUT_CSS.read_text()
+    assert ".flex" in output_css_path.read_text()
 
-    with open("assets/static/style.css", "a") as fp:
+    with open(tmp_project_path / "assets/static/style.css", "a") as fp:
         fp.write(".SENTINEL { color: red }\n")
 
     lektor_server.wait_for_build()
-    assert ".SENTINEL" in OUTPUT_CSS.read_text()
-    assert "tailwindcss" in OUTPUT_CSS.read_text()
+    assert ".SENTINEL" in output_css_path.read_text()
+    assert ".flex" in output_css_path.read_text()

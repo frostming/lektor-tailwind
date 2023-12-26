@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
-        lektor-version: [latest, stable]
+        lektor-version: [dev, stable]
     steps:
       - uses: actions/checkout@v3
 
@@ -23,23 +23,5 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache PIP
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ matrix.python-version }}-${{ matrix.lektor-version }}
-          restore-keys: pip-${{ matrix.python-version }}-
-
-      - name: Install Lektor latest
-        if: matrix.lektor-version == 'latest'
-        run: pip install "lektor @ git+https://github.com/lektor/lektor.git"
-
-      - name: Install Lektor stable
-        if: matrix.lektor-version == 'stable'
-        run: pip install -U lektor
-
-      - name: Install Pytest
-        run: pip install -U pytest
-
       - name: Run tests
-        run: pytest tests
+        run: pipx run nox -s "tests-${{ matrix.python-version }}(lektor_version='${{ matrix.lektor-version }}')"

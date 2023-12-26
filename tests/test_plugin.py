@@ -11,9 +11,7 @@ from textwrap import dedent
 
 import pytest
 
-PACKAGE_FILES = (
-    "setup.py", "setup.cfg", "lektor_tailwind.py", "README.md", "LICENSE"
-)
+PACKAGE_FILES = ("setup.py", "setup.cfg", "lektor_tailwind.py", "README.md", "LICENSE")
 
 
 @pytest.fixture
@@ -34,13 +32,6 @@ def tmp_project_path(tmp_path, monkeypatch):
     for fn in "_build", "packages":
         shutil.rmtree(project / fn, ignore_errors=True)
 
-    # Copy plugin source files to project packages
-    srcdir = testdir / ".."
-    packagedir = project / "packages/tailwind"
-    packagedir.mkdir(parents=True)
-    for fn in PACKAGE_FILES:
-        shutil.copy(srcdir / fn, packagedir / fn)
-
     monkeypatch.setenv("LEKTOR_PROJECT", os.fspath(project))
 
     return project
@@ -59,7 +50,9 @@ def slow_build(tmp_project_path):
 
     plugin = tmp_project_path / "packages/slow_build"
     plugin.mkdir(parents=True)
-    plugin.joinpath("setup.py").write_text(dedent("""
+    plugin.joinpath("setup.py").write_text(
+        dedent(
+            """
         from setuptools import setup
         setup(
             name="lektor-slow-build",
@@ -69,15 +62,21 @@ def slow_build(tmp_project_path):
                 ],
             },
         )
-    """))
-    plugin.joinpath("lektor_slow_build.py").write_text(dedent(f"""
+    """
+        )
+    )
+    plugin.joinpath("lektor_slow_build.py").write_text(
+        dedent(
+            f"""
         import time
         from lektor.pluginsystem import Plugin
 
         class SlowBuildPlugin(Plugin):
             def on_before_build_all(self, *args, **kwargs):
                 time.sleep({build_delay:f})
-    """))
+    """
+        )
+    )
 
 
 class LektorServerFixture:
@@ -131,8 +130,7 @@ class LektorServerFixture:
         try_until = time.time() + timeout
 
         while not (
-            stdout.contains(self.FINISHED_PRUNE)
-            and stderr.contains(self.TAILWIND_DONE)
+            stdout.contains(self.FINISHED_PRUNE) and stderr.contains(self.TAILWIND_DONE)
         ):
             time_left = try_until - time.time()
             if time_left <= 0:
@@ -152,7 +150,7 @@ class LektorServerFixture:
         def discard_one(self, regexp):
             m = re.search(regexp, self.buf)
             if m is not None:
-                self.buf = self.buf[m.end():]
+                self.buf = self.buf[m.end() :]
 
     def _communicate1(self, timeout):
         """Append any available output to the appropriate buffer."""

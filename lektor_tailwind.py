@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import os
 import subprocess
-import threading
 
 from lektor.pluginsystem import Plugin
-from pytailwindcss import install, get_bin_path
+from pytailwindcss import get_bin_path, install
 
 __version__ = "0.1.2"
 GRACEFUL_TIMEOUT = 5

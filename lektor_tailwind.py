@@ -22,6 +22,7 @@ class TailwindPlugin(Plugin):
         self.css_path = config.get("css_path", "static/style.css")
         self.input_css = os.path.join(self.env.root_path, "assets", self.css_path)
         self.tailwind: subprocess.Popen | None = None
+        self.config_file = "tailwind.config.js"
 
     def on_setup_env(self, **extra):
         self.init_tailwindcss()
@@ -29,8 +30,7 @@ class TailwindPlugin(Plugin):
     def init_tailwindcss(self):
         if not os.path.exists(self.tailwind_bin):
             install(bin_path=self.tailwind_bin)
-        filename = "tailwind.config.js"
-        if not os.path.exists(os.path.join(self.env.root_path, filename)):
+        if not os.path.exists(os.path.join(self.env.root_path, self.config_file)):
             subprocess.run(
                 [self.tailwind_bin, "init"], check=True, cwd=self.env.root_path
             )
@@ -38,35 +38,30 @@ class TailwindPlugin(Plugin):
     def _run_watcher(self, output_path: str):
         if not self.input_exists():
             return
+        self.tailwind = subprocess.Popen(
+            self._get_tailwind_args(output_path, "-w",
+                                    *(["--minify"] if os.environ.get("NODE_ENV") == "production" else [])),
+            cwd=output_path,
+        )
 
-        cmd = [
-            self.tailwind_bin,
-            "--input",
-            self.input_css,
-            "--output",
-            os.path.join(output_path, self.css_path),
-            "--watch",
-        ]
-        if os.environ.get("NODE_ENV") == "production":
-            cmd.append("--minify")
-
-        self.tailwind = subprocess.Popen(cmd, cwd=self.env.root_path)
+    def _get_tailwind_args(self, output_path, *extra_args):
+        return [self.tailwind_bin,
+                "-c",
+                os.path.join(self.env.root_path, self.config_file),
+                "-i",
+                self.input_css,
+                "-o",
+                os.path.join(output_path, self.css_path),
+                *extra_args,]
 
     def input_exists(self) -> bool:
         return os.path.exists(self.input_css)
 
     def compile_css(self, output_path: str):
         subprocess.run(
-            [
-                self.tailwind_bin,
-                "-i",
-                self.input_css,
-                "-o",
-                os.path.join(output_path, self.css_path),
-                "--minify",
-            ],
+            self._get_tailwind_args(output_path, "--minify"),
             check=True,
-            cwd=self.env.root_path,
+            cwd=output_path,
         )
 
     def on_server_spawn(self, **extra):
@@ -82,26 +77,10 @@ class TailwindPlugin(Plugin):
                 self.tailwind.kill()
             self.tailwind = None
 
-    def on_before_build_all(self, builder, **extra):
-        if not self.input_exists() or self.tailwind is not None or not self.watch:
+    def on_after_build_all(self, builder, **extra):
+        if not self.input_exists() or self.tailwind is not None:
             return
-        self._run_watcher(builder.destination_path)
-
-    def on_before_build(self, builder, source, prog, **extra):
-        if source.source_filename != self.input_css:
-            return
-
-        # The input stylesheet is being built.  We don't want to let
-        # Lektor "build" it (i.e. copy it to the output directory),
-        # since that will potentially overwrite any Tailwind-compiled
-        # output that is already there.
-
-        # Here we monkey-patch Lektor's build program to disable it
-        prog.build_artifact = lambda artifact: None
-
-        # Instead, we run tailwind to compile the self.input_css to
-        # the output directory.  (We skip this if we're already
-        # running tailwind in --watch mode, since, in that case, it
-        # will rebuild the CSS on it's own.)
-        if self.tailwind is None:
+        if self.watch:
+            self._run_watcher(builder.destination_path)
+        else:
             self.compile_css(builder.destination_path)

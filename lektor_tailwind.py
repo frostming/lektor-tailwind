@@ -6,9 +6,7 @@ import subprocess
 from lektor.pluginsystem import Plugin
 from pytailwindcss import get_bin_path, install
 
-__version__ = "0.1.2"
-GRACEFUL_TIMEOUT = 5
-
+__version__ = "0.1.3"
 
 class TailwindPlugin(Plugin):
     name = "lektor-tailwind"
@@ -35,15 +33,6 @@ class TailwindPlugin(Plugin):
                 [self.tailwind_bin, "init"], check=True, cwd=self.env.root_path
             )
 
-    def _run_watcher(self, output_path: str):
-        if not self.input_exists():
-            return
-        self.tailwind = subprocess.Popen(
-            self._get_tailwind_args(output_path, "-w",
-                                    *(["--minify"] if os.environ.get("NODE_ENV") == "production" else [])),
-            cwd=output_path,
-        )
-
     def _get_tailwind_args(self, output_path, *extra_args):
         return [self.tailwind_bin,
                 "-c",
@@ -58,8 +47,9 @@ class TailwindPlugin(Plugin):
         return os.path.exists(self.input_css)
 
     def compile_css(self, output_path: str):
+        minify = [] if self.watch else ["--minify"]
         subprocess.run(
-            self._get_tailwind_args(output_path, "--minify"),
+            self._get_tailwind_args(output_path, *minify),
             check=True,
             cwd=output_path,
         )
@@ -67,20 +57,7 @@ class TailwindPlugin(Plugin):
     def on_server_spawn(self, **extra):
         self.watch = True
 
-    def on_server_stop(self, **extra):
-        self.watch = False
-        if self.tailwind is not None:
-            self.tailwind.terminate()
-            try:
-                self.tailwind.communicate(GRACEFUL_TIMEOUT)
-            except subprocess.TimeoutExpired:
-                self.tailwind.kill()
-            self.tailwind = None
-
     def on_after_build_all(self, builder, **extra):
-        if not self.input_exists() or self.tailwind is not None:
+        if not self.input_exists():
             return
-        if self.watch:
-            self._run_watcher(builder.destination_path)
-        else:
-            self.compile_css(builder.destination_path)
+        self.compile_css(builder.destination_path)

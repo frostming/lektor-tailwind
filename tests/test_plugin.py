@@ -85,7 +85,6 @@ class LektorServerFixture:
     def __init__(self, port=9527):
         proc = subprocess.Popen(
             ("lektor", "server", "-p", f"{port:d}"),
-            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             bufsize=0,
@@ -101,9 +100,6 @@ class LektorServerFixture:
             try:
                 self.sel.close()
                 proc.terminate()
-                proc.stdin.close()
-                proc.stdout.close()
-                proc.stderr.close()
                 proc.wait(5)
             except (subprocess.TimeoutExpired, OSError):
                 proc.kill()
@@ -186,6 +182,8 @@ def test_server_rebuilds_css_when_template_updated(
     lektor_server.wait_for_build()
     assert ".flex" in output_css_path.read_text()
 
+    # Give the server a chance to pick up the changes before we start writing
+    time.sleep(1)
     with open(tmp_project_path / "templates/layout.html", "a") as fp:
         fp.write("""<div class="before:content-['SENTINEL']"></div>\n""")
 
@@ -200,6 +198,8 @@ def test_server_rebuilds_css_when_input_css_updated(
     lektor_server.wait_for_build()
     assert ".flex" in output_css_path.read_text()
 
+    # Give the server a chance to pick up the changes before we start writing
+    time.sleep(1)
     with open(tmp_project_path / "assets/static/style.css", "a") as fp:
         fp.write(".SENTINEL { color: red }\n")
 

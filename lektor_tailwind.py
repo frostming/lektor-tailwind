@@ -46,8 +46,11 @@ class TailwindPlugin(Plugin):
     def input_exists(self) -> bool:
         return os.path.exists(self.input_css)
 
+    def should_minify(self) -> bool:
+        return not self.watch or os.environ.get("NODE_ENV") == "production"
+
     def compile_css(self, output_path: str):
-        minify = [] if self.watch else ["--minify"]
+        minify = ["--minify"] if self.should_minify() else []
         subprocess.run(
             self._get_tailwind_args(output_path, *minify),
             check=True,

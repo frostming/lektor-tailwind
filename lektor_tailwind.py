@@ -6,7 +6,7 @@ import subprocess
 from lektor.pluginsystem import Plugin
 from pytailwindcss import get_bin_path, install
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 class TailwindPlugin(Plugin):
     name = "lektor-tailwind"

@@ -6,7 +6,8 @@ import subprocess
 from lektor.pluginsystem import Plugin
 from pytailwindcss import get_bin_path, install
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
+
 
 class TailwindPlugin(Plugin):
     name = "lektor-tailwind"
@@ -29,12 +30,14 @@ class TailwindPlugin(Plugin):
             install(bin_path=self.tailwind_bin)
 
     def _get_tailwind_args(self, output_path, *extra_args):
-        return [self.tailwind_bin,
-                "-i",
-                self.input_css,
-                "-o",
-                os.path.join(output_path, self.css_path),
-                *extra_args]
+        return [
+            self.tailwind_bin,
+            "-i",
+            self.input_css,
+            "-o",
+            os.path.join(output_path, self.css_path),
+            *extra_args,
+        ]
 
     def input_exists(self) -> bool:
         return os.path.exists(self.input_css)

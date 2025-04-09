@@ -18,32 +18,16 @@ A Lektor plugin that adds Tailwind CSS to your project seamlessly.
    $ lektor plugin list
    ```
 
-2. Configure your template paths
-
-   In `tailwindcss.config.js`:
-
-   ```javascript
-   module.exports = {
-     // './' refers to the lektor build output directory, NOT the project dir
-     content: ['./**/*.html'],
-     theme: {
-       extend: {},
-     },
-     plugins: [],
-   }
-   ```
-
-3. Add the Tailwind directives to your CSS
+2. Add the Tailwind directives to your CSS
 
    In `assets/static/style.css`:
 
    ```css
-   @tailwind base;
-   @tailwind components;
-   @tailwind utilities;
+   @import "tailwindcss";
+   @plugin "@tailwindcss/typography";
    ```
 
-4. Start lektor build or server:
+3. Start lektor build or server:
 
    ```bash
    $ lektor build

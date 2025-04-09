@@ -20,7 +20,6 @@ class TailwindPlugin(Plugin):
         self.css_path = config.get("css_path", "static/style.css")
         self.input_css = os.path.join(self.env.root_path, "assets", self.css_path)
         self.tailwind: subprocess.Popen | None = None
-        self.config_file = "tailwind.config.js"
 
     def on_setup_env(self, **extra):
         self.init_tailwindcss()
@@ -28,20 +27,14 @@ class TailwindPlugin(Plugin):
     def init_tailwindcss(self):
         if not os.path.exists(self.tailwind_bin):
             install(bin_path=self.tailwind_bin)
-        if not os.path.exists(os.path.join(self.env.root_path, self.config_file)):
-            subprocess.run(
-                [self.tailwind_bin, "init"], check=True, cwd=self.env.root_path
-            )
 
     def _get_tailwind_args(self, output_path, *extra_args):
         return [self.tailwind_bin,
-                "-c",
-                os.path.join(self.env.root_path, self.config_file),
                 "-i",
                 self.input_css,
                 "-o",
                 os.path.join(output_path, self.css_path),
-                *extra_args,]
+                *extra_args]
 
     def input_exists(self) -> bool:
         return os.path.exists(self.input_css)

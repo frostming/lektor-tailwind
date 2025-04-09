@@ -15,4 +15,4 @@ def tests(session: nox.Session, lektor_version: str):
     session.install(".")
 
     # 运行测试
-    session.run("pytest", "tests")
+    session.run("pytest", "tests", *session.posargs)

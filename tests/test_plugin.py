@@ -213,4 +213,4 @@ def test_server_build_minified(lektor_server, output_css_path, node_env):
     lektor_server.wait_for_build()
     assert ".flex" in output_css_path.read_text()
     lines_of_css = len(output_css_path.read_text().splitlines())
-    assert lines_of_css == 1
+    assert lines_of_css == 2
